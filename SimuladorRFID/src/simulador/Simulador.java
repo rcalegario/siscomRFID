@@ -1,6 +1,7 @@
 package simulador;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Random;
 
 public class Simulador {
@@ -74,20 +75,53 @@ public class Simulador {
 		return slots;
 	}
 	
-	public static int[] qtd_slots(int total_etiquetas, int incre_etiqueta, int interacao, int slots_iniciais, String estimador){
+	public static int simuladorQ(double cq, int qtd_etiquetas){
+		Random ran = new Random();
+		int total_slots_usados = 0, slot_obs;
+		double qfp = 4.0, q;
+		
+		do{
+			total_slots_usados++;
+			
+			q = Math.round(qfp);
+			int quadro = (int) Math.pow(2.0, q);
+			
+			slot_obs = 0;
+			for (int i = 0; i < qtd_etiquetas; i++) {
+				if(ran.nextInt(quadro) == 0) 
+					slot_obs++;
+			}
+			
+			if(slot_obs == 0) 
+				qfp = Math.max(0,  qfp-cq);
+			else if(slot_obs > 1) 
+				qfp = Math.min(15, qfp+cq);
+			else
+				qtd_etiquetas--;
+			
+			//System.out.println("slots usado " + total_slots_usados + "\netiquetas obs: " + slot_obs + "\nqfp "+qfp);
+			
+		}while(qtd_etiquetas > 0);
+		
+		return total_slots_usados;
+	}
+	
+	public static int[] qtd_slots(int total_etiquetas, int incre_etiqueta, int interacao, int slots_iniciais, String estimador, double cp){
 		int k = total_etiquetas/incre_etiqueta;
 		int[] qtd_totals_slots = new int[k+1];
-		
-		//valor para 1 etiqueta
-		for (int j = 0; j < interacao; j++) {
-			qtd_totals_slots[0] += simulacao(slots_iniciais, 1, estimador);	
-		}
-		qtd_totals_slots[0] = qtd_totals_slots[0]/interacao;
-		
-		for (int i = 1; i < qtd_totals_slots.length; i++) {
+			
+		for (int i = 0; i < qtd_totals_slots.length; i++) {
+			
+			int qtd_etiquetas = 100*i;
+			if(i == 0) qtd_etiquetas = 1; //valor para 1 etiqueta
+			System.out.println(qtd_etiquetas);
+			
 			for (int j = 0; j < interacao; j++) {
-				qtd_totals_slots[i] += simulacao(slots_iniciais, (100*i), estimador);	
-			}
+				if(cp == 0) qtd_totals_slots[i] += simulacao(slots_iniciais, qtd_etiquetas, estimador);
+				else qtd_totals_slots[i] += simuladorQ(cp,qtd_etiquetas);
+					
+			}				
+			
 			qtd_totals_slots[i] = qtd_totals_slots[i]/interacao;
 		}
 		
@@ -98,8 +132,14 @@ public class Simulador {
 
 		ArrayList<int[]> resultado = new ArrayList<>();
 		
-		resultado.add(qtd_slots(1000,100,2000,64,"lowerbound"));
-		resultado.add(qtd_slots(1000,100,2000,64,"eom-lee"));
+		Date date = new Date();
+		
+		resultado.add(qtd_slots(1000,100,2000,64,"lowerbound",0.0));
+		System.out.println(date.toString());
+		resultado.add(qtd_slots(1000,100,2000,64,"eom-lee",0.0));
+		System.out.println(date.toString());
+		resultado.add(qtd_slots(1000,100,2000,0,"q",0.3));
+		System.out.println(date.toString());
 		
 		for (int[] is : resultado) {
 			for (int i = 0; i < is.length; i++) {
@@ -107,8 +147,6 @@ public class Simulador {
 			}
 			System.out.println();
 		}
-		
 	}
 	
 }
-

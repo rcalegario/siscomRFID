@@ -1,7 +1,5 @@
 package simulador;
 
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.Random;
 
 public class Simulador {
@@ -19,8 +17,7 @@ public class Simulador {
 	private int[] total_slots;
 	private int[] total_slots_vazio;
 	private int[] total_slots_colisao;
-	private double[] tempo_simulacao;
-	private String nome_arquivo;
+	private long[] tempo_simulacao;
 	
 	public Simulador(String e, int qie, int i, int me, int r, int qi){
 		this.estimador = e;
@@ -39,11 +36,7 @@ public class Simulador {
 		this.total_slots = new int[tan];
 		this.total_slots_vazio = new int[tan];
 		this.total_slots_colisao = new int[tan];
-		this.tempo_simulacao = new double[tan];
-		
-		this.simular();
-		
-		this.nome_arquivo = this.gerar_arquivo();
+		this.tempo_simulacao = new long[tan];
 	}
 
 	private int lowerbound(int colisoes){
@@ -73,7 +66,9 @@ public class Simulador {
 		
 	}
 	
-	private void simulador(int posicao){
+	public void simulador(int posicao){
+		
+		long t0 = System.currentTimeMillis();
 		
 		Random ran = new Random();
 		int total_slots = 0;
@@ -124,9 +119,11 @@ public class Simulador {
 		}while(colisao != 0);
 		
 		this.total_slots[posicao] += total_slots;
+		
+		this.tempo_simulacao[posicao] += System.currentTimeMillis()-t0;
 	}
 	
-	private void simuladorQ(int posicao){
+	public int simuladorQ(int posicao){
 		Random ran = new Random();
 		
 		int total_slots_usados = 0, slot_obs;
@@ -145,36 +142,29 @@ public class Simulador {
 					slot_obs++;
 			}
 			
-			if(slot_obs == 0){ 
+			if(slot_obs == 0) 
 				qfp = Math.max(0,  qfp-cq);
-				this.total_slots_vazio[posicao]++;
-			}else if(slot_obs > 1){ 
+			else if(slot_obs > 1) 
 				qfp = Math.min(15, qfp+cq);
-				this.total_slots_colisao[posicao]++;
-			}else
+			else
 				qtd_etiquetas--;
 			
 			//System.out.println("slots usado " + total_slots_usados + "\netiquetas obs: " + slot_obs + "\nqfp "+qfp);
 			
 		}while(qtd_etiquetas > 0);
 		
-		this.total_slots[posicao] += total_slots_usados;
+		return total_slots_usados;
 	}
 	
-	private void simular(){
+	public void simular(){
 			
 		for (int i = 0; i < this.qtd_etiquetas.length; i++) {
 			
 			for (int j = 0; j < this.repeticao; j++) {
-				double inicio = System.currentTimeMillis();
-
 				if(!this.estimador.equalsIgnoreCase("q")) 
 					simulador(i);
 				else
 					simuladorQ(i);
-				
-				double fim = System.currentTimeMillis();
-				this.tempo_simulacao[i] += fim-inicio;
 			}				
 			
 			this.total_slots[i] = this.total_slots[i]/this.repeticao;
@@ -183,30 +173,6 @@ public class Simulador {
 			this.tempo_simulacao[i] = this.tempo_simulacao[i]/this.repeticao;
 		}
 		
-	}
-	
-	public String gerar_arquivo(){
-		
-		String nome_arquivo = estimador + "_" + qtd_inicial_etiquetas + "_" + incremeto + "_"+ max_etiquetas + "_"+ repeticao + "_"+ quadro_inicial + ".txt";
-		
-		try {
-			FileWriter writer = new FileWriter(nome_arquivo);
-
-			for (int i = 0; i < qtd_etiquetas.length; i++) {
-				if(i == 0) 
-					writer.write(qtd_etiquetas[i] + " " + total_slots[i] + " " + total_slots_colisao[i] + " " + total_slots_vazio[i] + " " + tempo_simulacao[i] + "\n");
-				else 
-					writer.append(qtd_etiquetas[i] + " " + total_slots[i] + " " + total_slots_colisao[i] + " " + total_slots_vazio[i] + " " + tempo_simulacao[i] + "\n");
-			}
-
-			writer.flush();
-			writer.close();
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-		return nome_arquivo;
 	}
 	
 	public String toString(){

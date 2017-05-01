@@ -20,7 +20,6 @@ public class Simulador {
 	private int[] total_slots_vazio;
 	private int[] total_slots_colisao;
 	private double[] tempo_simulacao;
-	private String nome_arquivo;
 	
 	public Simulador(String e, int qie, int i, int me, int r, int qi){
 		this.estimador = e;
@@ -43,7 +42,7 @@ public class Simulador {
 		
 		this.simular();
 		
-		this.nome_arquivo = this.gerar_arquivo();
+		this.gerar_arquivo();
 	}
 
 	private int lowerbound(int colisoes){
@@ -185,18 +184,16 @@ public class Simulador {
 		
 	}
 	
-	public String gerar_arquivo(){
-		
-		String nome_arquivo = estimador + "_" + qtd_inicial_etiquetas + "_" + incremeto + "_"+ max_etiquetas + "_"+ repeticao + "_"+ quadro_inicial + ".txt";
+	public void gerar_arquivo(){
 		
 		try {
-			FileWriter writer = new FileWriter(nome_arquivo);
+			FileWriter writer = new FileWriter(estimador + "_" + qtd_inicial_etiquetas + "_" + incremeto + "_"+ max_etiquetas + "_"+ repeticao + "_"+ quadro_inicial + ".txt");
 
 			for (int i = 0; i < qtd_etiquetas.length; i++) {
 				if(i == 0) 
-					writer.write(qtd_etiquetas[i] + " " + total_slots[i] + " " + total_slots_colisao[i] + " " + total_slots_vazio[i] + " " + tempo_simulacao[i] + "\n");
+					writer.write(qtd_etiquetas[i] + " " + total_slots[i] + " " + total_slots_colisao[i] + " " + total_slots_vazio[i]);
 				else 
-					writer.append(qtd_etiquetas[i] + " " + total_slots[i] + " " + total_slots_colisao[i] + " " + total_slots_vazio[i] + " " + tempo_simulacao[i] + "\n");
+					writer.append(qtd_etiquetas[i] + " " + total_slots[i] + " " + total_slots_colisao[i] + " " + total_slots_vazio[i]);
 			}
 
 			writer.flush();
@@ -206,7 +203,6 @@ public class Simulador {
 			e.printStackTrace();
 		}
 		
-		return nome_arquivo;
 	}
 	
 	public String toString(){

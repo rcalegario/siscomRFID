@@ -781,3 +781,32 @@ java.lang.NullPointerException
 	at org.eclipse.equinox.launcher.Main.invokeFramework(Main.java:669)
 	at org.eclipse.equinox.launcher.Main.basicRun(Main.java:608)
 	at org.eclipse.equinox.launcher.Main.run(Main.java:1515)
+
+!ENTRY org.eclipse.core.resources 4 77 2017-04-30 14:43:51.414
+!MESSAGE '/Users/rodrigocalegario/Desktop/CIn/siscom/siscomRFID' is not a valid location for linked resources.
+
+!ENTRY org.eclipse.jdt.core 4 4 2017-04-30 14:43:51.537
+!MESSAGE Exception while updating external folders
+!STACK 1
+org.eclipse.core.internal.resources.ResourceException: '/Users/rodrigocalegario/Desktop/CIn/siscom/siscomRFID' is not a valid location for linked resources.
+	at org.eclipse.core.internal.resources.Resource.assertLinkRequirements(Resource.java:174)
+	at org.eclipse.core.internal.resources.Resource.createLink(Resource.java:657)
+	at org.eclipse.core.internal.resources.Resource.createLink(Resource.java:631)
+	at org.eclipse.jdt.internal.core.ExternalFoldersManager.createLinkFolder(ExternalFoldersManager.java:175)
+	at org.eclipse.jdt.internal.core.ExternalFoldersManager.createLinkFolder(ExternalFoldersManager.java:167)
+	at org.eclipse.jdt.internal.core.ExternalFolderChange.updateExternalFoldersIfNecessary(ExternalFolderChange.java:49)
+	at org.eclipse.jdt.internal.core.DeltaProcessor.resourceChanged(DeltaProcessor.java:2097)
+	at org.eclipse.jdt.internal.core.DeltaProcessingState.resourceChanged(DeltaProcessingState.java:477)
+	at org.eclipse.core.internal.events.NotificationManager$1.run(NotificationManager.java:299)
+	at org.eclipse.core.runtime.SafeRunner.run(SafeRunner.java:42)
+	at org.eclipse.core.internal.events.NotificationManager.notify(NotificationManager.java:289)
+	at org.eclipse.core.internal.events.NotificationManager.broadcastChanges(NotificationManager.java:152)
+	at org.eclipse.core.internal.resources.Workspace.broadcastBuildEvent(Workspace.java:359)
+	at org.eclipse.core.internal.events.AutoBuildJob.doBuild(AutoBuildJob.java:140)
+	at org.eclipse.core.internal.events.AutoBuildJob.run(AutoBuildJob.java:235)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:55)
+!SUBENTRY 1 org.eclipse.core.resources 4 77 2017-04-30 14:43:51.537
+!MESSAGE '/Users/rodrigocalegario/Desktop/CIn/siscom/siscomRFID' is not a valid location for linked resources.
+
+!ENTRY org.eclipse.core.resources 4 77 2017-04-30 14:49:21.730
+!MESSAGE '/Users/rodrigocalegario/Desktop/CIn/siscom/siscomRFID' is not a valid location for linked resources.

@@ -1,0 +1,10 @@
+package simulador;
+
+public class Principal {
+	
+	public static void main(String[] args) {
+		Simulador lowerbound = new Simulador("lowerbound", 100, 100, 1000, 2000, 64);
+		lowerbound.simular();
+	}
+	
+}

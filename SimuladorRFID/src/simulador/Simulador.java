@@ -1,22 +1,54 @@
 package simulador;
 
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.Random;
 
 public class Simulador {
+	
+	// Entradas
+	private String estimador;
+	private int qtd_inicial_etiquetas;
+	private int incremeto;
+	private int max_etiquetas;
+	private int repeticao;
+	private int quadro_inicial;
+	
+	// Saidas
+	private int[] qtd_etiquetas;
+	private int[] total_slots;
+	private int[] total_slots_vazio;
+	private int[] total_slots_colisao;
+	private long[] tempo_simulacao;
+	
+	public Simulador(String e, int qie, int i, int me, int r, int qi){
+		this.estimador = e;
+		this.qtd_inicial_etiquetas = qie;
+		this.incremeto = i;
+		this.max_etiquetas = me;
+		this.repeticao = r;
+		this.quadro_inicial = qi;
+		
+		int tan = (this.max_etiquetas/this.incremeto)+1;
+		this.qtd_etiquetas = new int[tan];
+		for (int j = 0; j < qtd_etiquetas.length; j++) {
+			if(j == 0) qtd_etiquetas[j] = 1;
+			else qtd_etiquetas[j] = this.qtd_inicial_etiquetas + this.incremeto * (j-1);
+		}
+		this.total_slots = new int[tan];
+		this.total_slots_vazio = new int[tan];
+		this.total_slots_colisao = new int[tan];
+		this.tempo_simulacao = new long[tan];
+	}
 
-	public static int lowerbound(int colisoes){
+	private int lowerbound(int colisoes){
 		return colisoes * 2;
 	}
 	
-	public static int eomlee(double colisoes, double sucessos, double tamanho_quadro){
+	private int eomlee(double colisoes, double sucessos, double tamanho_quadro){
 		double limiar =  0.001;
 		double gama_atual = 0;
 		double gama_anterior = 2;
-		boolean parar = false;
 		
-		while(!parar){
+		do{
 			
 			double betaK = tamanho_quadro/(gama_anterior*colisoes + sucessos);
 			
@@ -26,59 +58,77 @@ public class Simulador {
 			double b = betaK * (1 - eb);
 			gama_atual = a/b;
 			
-			if(Math.abs(gama_anterior - gama_atual) < limiar) parar = true;
 			gama_anterior = gama_atual;
-		}
+			
+		}while(Math.abs(gama_anterior - gama_atual) >= limiar);
 		
 		return (int) (gama_atual * colisoes);
 		
 	}
 	
-	public static int simulacao(int quadro_inicail, int qtd_etiquetas, String estimador){
-		int slots = 0;
-		boolean colisao = true;
-		Random ran = new Random();
-		int tamanho_quadro = quadro_inicail;	
+	public void simulador(int posicao){
 		
-		while(colisao){
-			int[] slots_abertos = new int[tamanho_quadro];
-			slots += tamanho_quadro;
+		long t0 = System.currentTimeMillis();
+		
+		Random ran = new Random();
+		int total_slots = 0;
+		int quadro = this.quadro_inicial;
+		int qtd_etiquetas = this.qtd_etiquetas[posicao];
+		
+		int colisao = 0, sucesso = 0, vazio = 0;
+		
+		do{
+			colisao = 0; sucesso = 0; vazio = 0;
+			
+			total_slots += quadro;
+			
+			int[] slots_abertos = new int[quadro];
 			for (int i = 0; i < qtd_etiquetas; i++) {
-				int j = ran.nextInt(tamanho_quadro);
-				slots_abertos[j]++;
+				int n = ran.nextInt(quadro); //slot em que a etiqueta irá responder
+				slots_abertos[n]++;
 			}
 			
-			int[] estado = new int[3];// 0-colisao, 1-sucessos, 2-vazio
 			for (int i = 0; i < slots_abertos.length; i++) {
-				if(slots_abertos[i] > 1) estado[0]++;
-				else if(slots_abertos[i] == 1) estado[1]++;
-				else estado[2]++;
+				if(slots_abertos[i] > 1) {
+					colisao++;
+				} else if(slots_abertos[i] == 1){
+					sucesso++;
+				} else {
+					vazio++;					
+				}
 			}
 			
-			if(estado[0] > 0){
-				switch(estimador){
+			// escolha do estimador
+			if(colisao > 0){
+				switch(this.estimador){
 				case("lowerbound"):
-					tamanho_quadro = lowerbound(estado[0]);
-				break;
+					quadro = lowerbound(colisao);
+					break;
 				case("eom-lee"):
-					tamanho_quadro = eomlee(estado[0],estado[1],tamanho_quadro);
-				break;
+					quadro = eomlee(colisao,sucesso,quadro);
+					break;
 				}				
 			}
 			
-			qtd_etiquetas -= estado[1];
-			if(estado[0] == 0) colisao = false;
+			qtd_etiquetas -= sucesso;
+			
+			this.total_slots_vazio[posicao] += vazio;
+			this.total_slots_colisao[posicao] += colisao;
 			
 			//System.out.println("Colisões:\t" + estado[0] + "\tAcertos:\t" + estado[1] + "\tVazio:\t" + estado[2]);
-		}
+		}while(colisao != 0);
 		
-		return slots;
+		this.total_slots[posicao] += total_slots;
+		
+		this.tempo_simulacao[posicao] += System.currentTimeMillis()-t0;
 	}
 	
-	public static int simuladorQ(double cq, int qtd_etiquetas){
+	public int simuladorQ(int posicao){
 		Random ran = new Random();
+		
 		int total_slots_usados = 0, slot_obs;
-		double qfp = 4.0, q;
+		double qfp = 4.0, cq = 0.3, q;
+		int qtd_etiquetas = this.qtd_etiquetas[posicao];
 		
 		do{
 			total_slots_usados++;
@@ -106,47 +156,54 @@ public class Simulador {
 		return total_slots_usados;
 	}
 	
-	public static int[] qtd_slots(int total_etiquetas, int incre_etiqueta, int interacao, int slots_iniciais, String estimador, double cp){
-		int k = total_etiquetas/incre_etiqueta;
-		int[] qtd_totals_slots = new int[k+1];
+	public void simular(){
 			
-		for (int i = 0; i < qtd_totals_slots.length; i++) {
+		for (int i = 0; i < this.qtd_etiquetas.length; i++) {
 			
-			int qtd_etiquetas = 100*i;
-			if(i == 0) qtd_etiquetas = 1; //valor para 1 etiqueta
-			System.out.println(qtd_etiquetas);
-			
-			for (int j = 0; j < interacao; j++) {
-				if(cp == 0) qtd_totals_slots[i] += simulacao(slots_iniciais, qtd_etiquetas, estimador);
-				else qtd_totals_slots[i] += simuladorQ(cp,qtd_etiquetas);
-					
+			for (int j = 0; j < this.repeticao; j++) {
+				if(!this.estimador.equalsIgnoreCase("q")) 
+					simulador(i);
+				else
+					simuladorQ(i);
 			}				
 			
-			qtd_totals_slots[i] = qtd_totals_slots[i]/interacao;
+			this.total_slots[i] = this.total_slots[i]/this.repeticao;
+			this.total_slots_vazio[i] = this.total_slots_vazio[i]/this.repeticao;
+			this.total_slots_colisao[i] = this.total_slots_colisao[i]/this.repeticao;
+			this.tempo_simulacao[i] = this.tempo_simulacao[i]/this.repeticao;
 		}
 		
-		return qtd_totals_slots;
 	}
 	
-	public static void main(String[] args) {
-
-		ArrayList<int[]> resultado = new ArrayList<>();
+	public String toString(){
+		String retorno =  "ESTIMADOR: " + this.estimador;
 		
-		Date date = new Date();
-		
-		resultado.add(qtd_slots(1000,100,2000,64,"lowerbound",0.0));
-		System.out.println(date.toString());
-		resultado.add(qtd_slots(1000,100,2000,64,"eom-lee",0.0));
-		System.out.println(date.toString());
-		resultado.add(qtd_slots(1000,100,2000,0,"q",0.3));
-		System.out.println(date.toString());
-		
-		for (int[] is : resultado) {
-			for (int i = 0; i < is.length; i++) {
-				System.out.print(is[i] + " ");
-			}
-			System.out.println();
+		retorno += "\nQTD ETIQUETAS\t";
+		for (int i = 0; i < qtd_etiquetas.length; i++) {
+			retorno += this.qtd_etiquetas[i] + "\t";
 		}
+		
+		retorno += "\nTOTAL SLOTS\t";
+		for (int i = 0; i < qtd_etiquetas.length; i++) {
+			retorno += this.total_slots[i] + "\t";
+		}
+		
+		retorno += "\nSLOTS VAZIO\t";
+		for (int i = 0; i < qtd_etiquetas.length; i++) {
+			retorno += this.total_slots_vazio[i] + "\t";
+		}
+		
+		retorno += "\nSLOTS COLISAO\t";
+		for (int i = 0; i < qtd_etiquetas.length; i++) {
+			retorno += this.total_slots_colisao[i] + "\t";
+		}
+		
+		retorno += "\nTEMPO SIMULACAO\t";
+		for (int i = 0; i < qtd_etiquetas.length; i++) {
+			retorno += this.tempo_simulacao[i] + "\t";
+		}
+		
+		return retorno + "\n";
 	}
 	
 }

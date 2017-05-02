@@ -61,7 +61,7 @@ public class Plot {
 				plots += "4 ";
 				break;
 			}
-			plots += "t \'" + simulador[i].estimador + "\' w linespoints, \\ \n";
+			plots += "t \'" + simulador[i].estimador + "\' w linespoints, \n";
 			
 		}
 		

@@ -4,15 +4,15 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 public class Plot {
-	
+
 	public Plot(){
-		
+
 	}
-	
+
 	public void escrever_arquivo(String nome_arquivo, String corpo_arquivo){
 		try {
 			FileWriter writer = new FileWriter(nome_arquivo);
-			
+
 			writer.write(corpo_arquivo);
 
 			writer.flush();
@@ -22,10 +22,10 @@ public class Plot {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void grafico(Simulador[] simulador,String tipo){
 		String nome_arquivo = "";
-		
+
 		String xLabel = "set xlabel \"Número de etiquetas\"\n";
 		String yLabel = "";
 		switch(tipo){
@@ -42,11 +42,13 @@ public class Plot {
 			yLabel = "set ylabel \"Número total de slots vázio\"\n";
 			break;
 		}
-		
+
 		String setup1 = "set key vertical top left\n";
 		String setup2 = "set grid\n";
 		String setup3 = "set pointsize 2\n";
-		
+		String setup4 = "set terminal png\n";
+		String setup5 = "set output './results/" + tipo + ".png'\n";
+
 		String plots = "plot ";
 		for (int i = 0; i < simulador.length; i++) {
 			plots += "\"" + simulador[i].nome_arquivo + "\" u 1:";
@@ -61,15 +63,20 @@ public class Plot {
 				plots += "4 ";
 				break;
 			}
-			plots += "t \'" + simulador[i].estimador + "\' w linespoints, \n";
-			
+
+			if(i == simulador.length - 1) {
+				plots += "t \'" + simulador[i].estimador + "\' w linespoints \n";
+			} else {
+				plots += "t \'" + simulador[i].estimador + "\' w linespoints, ";
+			}
+
 		}
-		
-		String corpo_arquivo = xLabel + yLabel + setup1 + setup2 + setup3 + plots;
-		
+
+		String corpo_arquivo = xLabel + yLabel + setup1 + setup2 + setup3 + setup4 + setup5 + plots;
+
 		this.escrever_arquivo(nome_arquivo+".plt", corpo_arquivo);
 	}
-	
-	
-	
+
+
+
 }

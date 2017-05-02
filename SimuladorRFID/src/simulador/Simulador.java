@@ -7,7 +7,7 @@ import java.util.Random;
 public class Simulador {
 	
 	// Entradas
-	private String estimador;
+	public String estimador;
 	private int qtd_inicial_etiquetas;
 	private int incremeto;
 	private int max_etiquetas;
@@ -15,12 +15,12 @@ public class Simulador {
 	private int quadro_inicial;
 	
 	// Saidas
-	private int[] qtd_etiquetas;
-	private int[] total_slots;
-	private int[] total_slots_vazio;
-	private int[] total_slots_colisao;
-	private double[] tempo_simulacao;
-	private String nome_arquivo;
+	public int[] qtd_etiquetas;
+	public int[] total_slots;
+	public int[] total_slots_vazio;
+	public int[] total_slots_colisao;
+	public double[] tempo_simulacao;
+	public String nome_arquivo;
 	
 	public Simulador(String e, int qie, int i, int me, int r, int qi){
 		this.estimador = e;

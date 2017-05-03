@@ -63,13 +63,11 @@ public class Plot {
 				plots += "4 ";
 				break;
 			}
-
 			if(i == simulador.length - 1) {
 				plots += "t \'" + simulador[i].estimador + "\' w linespoints \n";
 			} else {
 				plots += "t \'" + simulador[i].estimador + "\' w linespoints, ";
 			}
-
 		}
 
 		String corpo_arquivo = xLabel + yLabel + setup1 + setup2 + setup3 + setup4 + setup5 + plots;

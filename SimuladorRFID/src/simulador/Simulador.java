@@ -206,7 +206,7 @@ public class Simulador {
 			e.printStackTrace();
 		}
 		
-		return nome_arquivo;
+		return System.getProperty("user.dir") + "/" + nome_arquivo;
 	}
 	
 	public String toString(){

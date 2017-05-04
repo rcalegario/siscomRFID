@@ -55,6 +55,8 @@ public class Simulador {
 		double gama_atual = 0;
 		double gama_anterior = 2;
 
+		boolean parar = false;
+
 		do{
 
 			double betaK = tamanho_quadro/(gama_anterior*colisoes + sucessos);
@@ -65,19 +67,19 @@ public class Simulador {
 			double b = betaK * (1 - eb);
 			gama_atual = a/b;
 
+			if(Math.abs(gama_anterior - gama_atual) < limiar) parar = true;
 			gama_anterior = gama_atual;
 
-		}while(Math.abs(gama_anterior - gama_atual) >= limiar);
+		}while(!parar);
 
-		return (int) (gama_atual * colisoes);
-
+		return (int) Math.ceil(gama_atual * colisoes);
 	}
 
 	private void simulador(int posicao){
 
 		Random ran = new Random();
 		int total_slots = 0;
-		int quadro = this.quadro_inicial;
+		int tan_quadro = this.quadro_inicial;
 		int qtd_etiquetas = this.qtd_etiquetas[posicao];
 
 		int colisao = 0, sucesso = 0, vazio = 0;
@@ -85,18 +87,18 @@ public class Simulador {
 		do{
 			colisao = 0; sucesso = 0; vazio = 0;
 
-			total_slots += quadro;
+			total_slots += tan_quadro;
 
-			int[] slots_abertos = new int[quadro];
+			int[] quadro = new int[tan_quadro];
 			for (int i = 0; i < qtd_etiquetas; i++) {
-				int n = ran.nextInt(quadro); //slot em que a etiqueta irá responder
-				slots_abertos[n]++;
+				int n = ran.nextInt(tan_quadro); //slot em que a etiqueta irá responder
+				quadro[n]++;
 			}
 
-			for (int i = 0; i < slots_abertos.length; i++) {
-				if(slots_abertos[i] > 1) {
+			for (int i = 0; i < quadro.length; i++) {
+				if(quadro[i] > 1) {
 					colisao++;
-				} else if(slots_abertos[i] == 1){
+				} else if(quadro[i] == 1){
 					sucesso++;
 				} else {
 					vazio++;
@@ -107,10 +109,10 @@ public class Simulador {
 			if(colisao > 0){
 				switch(this.estimador){
 				case("lowerbound"):
-					quadro = lowerbound(colisao);
+					tan_quadro = lowerbound(colisao);
 					break;
 				case("eom-lee"):
-					quadro = eomlee(colisao,sucesso,quadro);
+					tan_quadro = eomlee(colisao,sucesso,tan_quadro);
 					break;
 				}
 			}
@@ -120,8 +122,7 @@ public class Simulador {
 			this.total_slots_vazio[posicao] += vazio;
 			this.total_slots_colisao[posicao] += colisao;
 
-			//System.out.println("Colisões:\t" + estado[0] + "\tAcertos:\t" + estado[1] + "\tVazio:\t" + estado[2]);
-		}while(colisao != 0);
+		}while(qtd_etiquetas > 0);
 
 		this.total_slots[posicao] += total_slots;
 	}
@@ -216,7 +217,10 @@ public class Simulador {
 		try {
 			FileWriter writer = new FileWriter(nome_arquivo);
 
-			for (int i = 0; i < qtd_etiquetas.length; i++) {
+			int j = 1;
+			if(this.estimador.equals("q")) j = 0;
+
+			for (int i = j; i < qtd_etiquetas.length; i++) {
 				if(i == 0)
 					writer.write(qtd_etiquetas[i] + " " + total_slots[i] + " " + total_slots_colisao[i] + " " + total_slots_vazio[i] + " " + tempo_simulacao[i] + "\n");
 				else
@@ -230,7 +234,7 @@ public class Simulador {
 			e.printStackTrace();
 		}
 
-		return System.getProperty("user.dir") + "/" + nome_arquivo;
+		return nome_arquivo;
 	}
 
 	public String toString(){

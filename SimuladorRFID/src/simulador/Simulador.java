@@ -175,10 +175,7 @@ public class Simulador {
 			for (int j = 0; j < sim.repeticao; j++) {
 				double inicio = System.currentTimeMillis();
 
-				if(!sim.estimador.equalsIgnoreCase("q"))
-					sim.simulador(i);
-				else
-					sim.simuladorQ(i);
+				sim.simuladorQ(i);
 
 				double fim = System.currentTimeMillis();
 				sim.tempo_simulacao[i] += fim-inicio;
@@ -187,27 +184,38 @@ public class Simulador {
 	}
 
 	private void simular(){
-		Thread[] threads = new Thread[this.qtd_etiquetas.length];
 
-		for (int i = 0; i < this.qtd_etiquetas.length; i++) {
-			Thread t = new Thread(new ThreadSimuladora(i, this));
-			threads[i] = t;
-			threads[i].start();
-		}
+		if(!sim.estimador.equalsIgnoreCase("q")) {
+			Thread[] threads = new Thread[this.qtd_etiquetas.length];
 
-		for (int i = 0; i < this.qtd_etiquetas.length; i++) {
-			try {
-				threads[i].join();
-			} catch(Exception e) {
-				e.printStackTrace();
+			for (int i = 0; i < this.qtd_etiquetas.length; i++) {
+				Thread t = new Thread(new ThreadSimuladora(i, this));
+				threads[i] = t;
+				threads[i].start();
 			}
 
-			this.total_slots[i] = this.total_slots[i]/this.repeticao;
-			this.total_slots_vazio[i] = this.total_slots_vazio[i]/this.repeticao;
-			this.total_slots_colisao[i] = this.total_slots_colisao[i]/this.repeticao;
-			this.tempo_simulacao[i] = this.tempo_simulacao[i]/this.repeticao;
-		}
+			for (int i = 0; i < this.qtd_etiquetas.length; i++) {
+				try {
+					threads[i].join();
 
+					this.total_slots[i] = this.total_slots[i]/this.repeticao;
+					this.total_slots_vazio[i] = this.total_slots_vazio[i]/this.repeticao;
+					this.total_slots_colisao[i] = this.total_slots_colisao[i]/this.repeticao;
+					this.tempo_simulacao[i] = this.tempo_simulacao[i]/this.repeticao;
+				} catch(Exception e) {
+					e.printStackTrace();
+				}
+			}
+		else {
+			for (int i = 0; i < this.qtd_etiquetas.length; i++) {
+				sim.simulador(i);
+
+				this.total_slots[i] = this.total_slots[i]/this.repeticao;
+				this.total_slots_vazio[i] = this.total_slots_vazio[i]/this.repeticao;
+				this.total_slots_colisao[i] = this.total_slots_colisao[i]/this.repeticao;
+				this.tempo_simulacao[i] = this.tempo_simulacao[i]/this.repeticao;
+			}
+		}
 	}
 
 	public String gerar_arquivo(){

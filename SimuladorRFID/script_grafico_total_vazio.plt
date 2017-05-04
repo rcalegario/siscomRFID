@@ -1,6 +1,7 @@
 set xlabel "Número de etiquetas"
 set ylabel "Número total de slots vázio"
 set monochrome
+set yrange [0:1100]
 set key vertical top left
 set grid
 set pointsize 2

@@ -33,6 +33,10 @@ public class Plot {
 			nome_arquivo = "script_grafico_total_slots";
 			yLabel = "set ylabel \"Número total de slots\"\n";
 			break;
+		case("slotsq"):
+			nome_arquivo = "script_q_grafico_total_slots";
+			yLabel = "set ylabel \"Número total de slots\"\n";
+			break;
 		case("colisao"):
 			nome_arquivo = "script_grafico_total_colisao";
 			yLabel = "set ylabel \"Número total de slots em colisão\"\n";
@@ -57,10 +61,6 @@ public class Plot {
 
 		String plots = "plot ";
 		for (int i = 0; i < simulador.length; i++) {
-			if(simulador[i].estimador.equals("q")) {
-				if(tipo.equals("slots")) nome_arquivo = "script_q_grafico_total_slots";
-				setup5 = "set output './results/" + tipo + "q.png'\n";
-			}
 			plots += "\"" + simulador[i].nome_arquivo + "\" u 1:";
 			switch(tipo){
 			case("slots"):

@@ -27,12 +27,12 @@ public class Principal {
 		
 		
 		Simulador[] simuladoreQ = {algQ};
-		plot.grafico(simuladoreQ,"slots");
+		plot.grafico(simuladoreQ,"slotsq");
 		
 		Simulador[] simuladorTempo = {lowerbound, eomlee, algQ};
 		plot.grafico(simuladorTempo,"tempo");
 		
-		System.out.println(System.currentTimeMillis()-t0);
+		System.out.println("tempo final: " + (System.currentTimeMillis()-t0));
 	}
 	
 }

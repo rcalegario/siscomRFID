@@ -47,28 +47,52 @@ public class Simulator {
 		}
 	}
 
+	private static class SimulatorThread implements Runnable {
+		private int i;
+		private Simulator sim;
+
+		public SimulatorThread(int i, Simulator sim) {
+			this.i = i;
+			this.sim = sim;
+		}
+
+		public void run() {
+			System.out.println(sim.tagCount[i]);
+
+			for (int j = 0; j < 1; j++) {
+				double inicio = System.currentTimeMillis();
+
+				if(sim.estimador.equalsIgnoreCase("q")) {
+					sim.simulator(i);
+				} else {
+					sim.simulatorQ(i);
+				}
+
+				System.out.println("Total slots: " + sim.slotCount[i]);
+				System.out.println("Total slots vazio: " + sim.emptySlotCount[i]);
+				System.out.println("Total slots colisao: " + sim.collisionCount[i]);
+
+				double fim = System.currentTimeMillis();
+				sim.tempo_simulacao[i] += fim-inicio;
+			}
+		}
+	}
+
 	public String gerar_arquivo(){
 		String nome_arquivo = estimador + ".txt";
+		String corpo_arquivo = "";
 
-		try {
-			FileWriter writer = new FileWriter(nome_arquivo);
+		int j = 1;
+		if(this.estimador.equals("q")) j = 0;
 
-			int j = 1;
-			if(this.estimador.equals("q")) j = 0;
-
-			for (int i = j; i < tagCount.length; i++) {
-				if(i == 0)
-					writer.write(tagCount[i] + " " + slotCount[i] + " " + collisionCount[i] + " " + emptySlotCount[i] + " " + tempo_simulacao[i] + "\n");
-				else
-					writer.append(tagCount[i] + " " + slotCount[i] + " " + collisionCount[i] + " " + emptySlotCount[i] + " " + tempo_simulacao[i] + "\n");
-			}
-
-			writer.flush();
-			writer.close();
-
-		} catch (IOException e) {
-			e.printStackTrace();
+		for (int i = j; i < tagCount.length; i++) {
+			if(i == 0)
+				corpo_arquivo.append(tagCount[i] + " " + slotCount[i] + " " + collisionCount[i] + " " + emptySlotCount[i] + " " + tempo_simulacao[i] + "\n");
+			else
+				corpo_arquivo.append(tagCount[i] + " " + slotCount[i] + " " + collisionCount[i] + " " + emptySlotCount[i] + " " + tempo_simulacao[i] + "\n");
 		}
+
+		FileHandling.writeContent(nome_arquivo, corpo_arquivo);
 
 		return nome_arquivo;
 	}

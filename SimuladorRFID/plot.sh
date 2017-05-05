@@ -1,3 +1,5 @@
+rm ./results/*
+
 gnuplot script_grafico_total_colisao.plt
 gnuplot script_grafico_total_slots.plt
 gnuplot script_grafico_total_vazio.plt

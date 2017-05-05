@@ -150,35 +150,4 @@ public class Simulation {
 		this.slotCount[posicao] += slotCount_usados;
 	}
 
-	private static class SimulatorThread implements Runnable {
-		private int i;
-		private Simulator sim;
-
-		public SimulatorThread(int i, Simulator sim) {
-			this.i = i;
-			this.sim = sim;
-		}
-
-		public void run() {
-			System.out.println(sim.tagCount[i]);
-
-			for (int j = 0; j < 1; j++) {
-				double inicio = System.currentTimeMillis();
-
-				if(sim.estimador.equalsIgnoreCase("q")) {
-					sim.simulator(i);
-				} else {
-					sim.simulatorQ(i);
-				}
-
-				System.out.println("Total slots: " + sim.slotCount[i]);
-				System.out.println("Total slots vazio: " + sim.emptySlotCount[i]);
-				System.out.println("Total slots colisao: " + sim.collisionCount[i]);
-
-				double fim = System.currentTimeMillis();
-				sim.tempo_simulacao[i] += fim-inicio;
-			}
-		}
-	}
-
 }

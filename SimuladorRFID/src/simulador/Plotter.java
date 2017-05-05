@@ -3,28 +3,22 @@ package simulador;
 import java.io.FileWriter;
 import java.io.IOException;
 
-public static class Plot {
-	
-	public void graficoTipo(String[] nomes,String tipo){
+public class Plotter {
+
+	private String[] estimadores;
+
+	public Plotter(String[] estimadores) {
+		this.estimadores = estimadores;
+	}
+
+	public void graficoTipo(String tipo){
 		String xLabel = "set xlabel \"Número de etiquetas\"\n";
 		String corpo_arquivo = xLabel + getYLabel(tipo) + getSetup(tipo) + getPlots(estimadores, tipos);
 
 		this.escrever_arquivo(getFileName(tipo)+".plt", corpo_arquivo);
 	}
 
-	public void escrever_arquivo(String nome_arquivo, String corpo_arquivo){
-		try {
-			FileWriter writer = new FileWriter(nome_arquivo);
-			writer.write(corpo_arquivo);
-			writer.flush();
-			writer.close();
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	public static void plotarGraficos() {
+	public void plotarGraficos() {
 		graficoTipo("slots");
 		graficoTipo("slotsq");
 		graficoTipo("colisao");
@@ -34,11 +28,11 @@ public static class Plot {
 
 	public void getSetup(String tipo) {
 		String setup = "set key vertical top left\n";
-		String setup += "set grid\n";
-		String setup += "set pointsize 2\n";
-		String setup += "set terminal png\n";
-		String setup += "set output './results/" + tipo + ".png'\n";
-		String setup += "set monochrome\n";
+		setup += "set grid\n";
+		setup += "set pointsize 2\n";
+		setup += "set terminal png\n";
+		setup += "set output './results/" + tipo + ".png'\n";
+		setup += "set monochrome\n";
 		if(tipo.equalsIgnoreCase("vazio"))
 			setup += "set yrange [0:1100]\n";
 		else if(tipo.equalsIgnoreCase("tempo")) {
@@ -106,6 +100,13 @@ public static class Plot {
 			}
 		}
 		return plots;
+	}
+
+	public String getSlotsString() {
+			String xLabel = "set xlabel \"Número de etiquetas\"\n";
+			String yLabel = "set ylabel \"Número total de slots\"\n";
+			String setup = getSetup();
+
 	}
 
 }

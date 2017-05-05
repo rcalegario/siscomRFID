@@ -3,38 +3,41 @@ package simulador;
 public class Principal {
 
 	public static void main(String[] args) {
+		long startTime = System.currentTimeMillis();
 
-		long t0 = System.currentTimeMillis();
-		System.out.println(t0);
+		runSimulations(getEstimatorList(args));
+		Plot.plotarGraficos();
 
-		Plot plot = new Plot();
-
-		Simulador lowerbound = new Simulador("lowerbound", 100, 100, 1000, 2000, 64);
-		System.out.println(lowerbound.toString());
-
-		System.out.println("tempo lowerbound: " + (System.currentTimeMillis()-t0));
-
-		Simulador eomlee = new Simulador("eom-lee", 100, 100, 1000, 2000, 64);
-		System.out.println(eomlee.toString());
-		System.out.println("tempo eomlee: " + (System.currentTimeMillis()-t0));
-
-		Simulador algQ = new Simulador("q", 100, 100, 1000, 2000, 64);
-		System.out.println(algQ.toString());
-		System.out.println("tempo q: " + (System.currentTimeMillis()-t0));
-
-		Simulador[] simuladores = {lowerbound, eomlee};
-		plot.grafico(simuladores,"slots");
-		plot.grafico(simuladores,"colisao");
-		plot.grafico(simuladores,"vazio");
-
-		Simulador[] simuladoreQ = {algQ};
-		plot.grafico(simuladoreQ,"slotsq");
-		
-		Simulador[] simuladorTempo = {lowerbound, eomlee, algQ};
-		plot.grafico(simuladorTempo,"tempo");
-		
-		System.out.println("tempo final: " + (System.currentTimeMillis()-t0));
-
+		println(System.currentTimeMillis() - startTime);
 	}
 
+	public Simulator[] getEstimatorList(args) {
+		if(args.length > 1) {
+			return args.slice(1);
+		} else {
+			return ["lowerbound", "eomlee", "algQ"];
+		}
+	}
+
+	public void runSimulations(Simulator[] estimators) {
+		for(Simulator estimator : estimators) {
+			Simulator Simulator = new Simulator(estimator, 100, 100, 1000, 2000, 64);
+			System.out.println(Simulator.simular());
+		}
+	}
+
+/*
+	public class SimulationThread implements Runnable {
+		private String estimator;
+
+		public SimulationThread(estimator) {
+			this.simulator = simulators;
+		}
+
+		public void run() {
+			Simulator Simulator = new Simulator(estimator, 100, 100, 1000, 2000, 64);
+			System.out.println(Simulator.simular());
+		}
+	}
+*/
 }

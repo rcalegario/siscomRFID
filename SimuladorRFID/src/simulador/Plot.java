@@ -3,18 +3,19 @@ package simulador;
 import java.io.FileWriter;
 import java.io.IOException;
 
-public class Plot {
+public static class Plot {
+	
+	public void graficoTipo(String[] nomes,String tipo){
+		String xLabel = "set xlabel \"Número de etiquetas\"\n";
+		String corpo_arquivo = xLabel + getYLabel(tipo) + getSetup(tipo) + getPlots(estimadores, tipos);
 
-	public Plot(){
-
+		this.escrever_arquivo(getFileName(tipo)+".plt", corpo_arquivo);
 	}
 
 	public void escrever_arquivo(String nome_arquivo, String corpo_arquivo){
 		try {
 			FileWriter writer = new FileWriter(nome_arquivo);
-
 			writer.write(corpo_arquivo);
-
 			writer.flush();
 			writer.close();
 
@@ -23,45 +24,67 @@ public class Plot {
 		}
 	}
 
-	public void grafico(Simulador[] simulador,String tipo){
-		String nome_arquivo = "";
+	public static void plotarGraficos() {
+		graficoTipo("slots");
+		graficoTipo("slotsq");
+		graficoTipo("colisao");
+		graficoTipo("vazio");
+		graficoTipo("tempo");
+	}
 
-		String xLabel = "set xlabel \"Número de etiquetas\"\n";
-		String yLabel = "";
-		switch(tipo){
-		case("slots"):
-			nome_arquivo = "script_grafico_total_slots";
-			yLabel = "set ylabel \"Número total de slots\"\n";
-			break;
-		case("slotsq"):
-			nome_arquivo = "script_q_grafico_total_slots";
-			yLabel = "set ylabel \"Número total de slots\"\n";
-			break;
-		case("colisao"):
-			nome_arquivo = "script_grafico_total_colisao";
-			yLabel = "set ylabel \"Número total de slots em colisão\"\n";
-			break;
-		case("vazio"):
-			nome_arquivo = "script_grafico_total_vazio";
-			yLabel = "set ylabel \"Número total de slots vázio\"\n";
-			break;
-		case("tempo"):
-			nome_arquivo = "script_grafico_tempo_medio";
-			yLabel = "set ylabel \"Tempo de Simulação\"\n";
-			break;
+	public void getSetup(String tipo) {
+		String setup = "set key vertical top left\n";
+		String setup += "set grid\n";
+		String setup += "set pointsize 2\n";
+		String setup += "set terminal png\n";
+		String setup += "set output './results/" + tipo + ".png'\n";
+		String setup += "set monochrome\n";
+		if(tipo.equalsIgnoreCase("vazio"))
+			setup += "set yrange [0:1100]\n";
+		else if(tipo.equalsIgnoreCase("tempo")) {
+			setup += "set logscale y\n";
 		}
+		return setup;
+	}
 
-		String setup1 = "set key vertical top left\n";
-		String setup2 = "set grid\n";
-		String setup3 = "set pointsize 2\n";
-		String setup4 = "set terminal png\n";
-		String setup5 = "set output './results/" + tipo + ".png'\n";
-		String setup6 = "set monochrome\n";
-		String setup7 = "";
+	public String getFileName(String tipo) {
+		switch(tipo) {
+			case("slots"):
+				return nome_arquivo = "script_grafico_total_slots";
+			case("slotsq"):
+				return nome_arquivo = "script_q_grafico_total_slots";
+			case("colisao"):
+				return nome_arquivo = "script_grafico_total_colisao";
+			case("vazio"):
+				return nome_arquivo = "script_grafico_total_vazio";
+			case("tempo"):
+				return nome_arquivo = "script_grafico_tempo_medio";
+			default:
+			 	return "";
+		}
+	}
 
+	public String getYLabel(String tipo) {
+		switch(tipo) {
+			case("slots"):
+				return "set ylabel \"Número total de slots\"\n";
+			case("slotsq"):
+				return "set ylabel \"Número total de slots\"\n";
+			case("colisao"):
+				return "set ylabel \"Número total de slots em colisão\"\n";
+			case("vazio"):
+				return "set ylabel \"Número total de slots vazio\"\n";
+			case("tempo"):
+				return "set ylabel \"Tempo de Simulação\"\n";
+			default:
+			 	return "";
+		}
+	}
+
+	public String getPlots(String tipo) {
 		String plots = "plot ";
-		for (int i = 0; i < simulador.length; i++) {
-			plots += "\"" + simulador[i].nome_arquivo + "\" u 1:";
+		for (int i = 0; i < Simulator.length; i++) {
+			plots += "\"" + nomes[i] + "\" u 1:";
 			switch(tipo){
 			case("slots"):
 				plots += "2 ";
@@ -71,25 +94,18 @@ public class Plot {
 				break;
 			case("vazio"):
 				plots += "4 ";
-				setup7 = "set yrange [0:1100]\n";
 				break;
 			case("tempo"):
 				plots += "5 ";
-				setup7 = "set logscale y\n";
 				break;
 			}
-			if(i == simulador.length - 1) {
-				plots += "t \'" + simulador[i].estimador + "\' w linespoints pt " + (i+1) + "\n";
+			if(i == Simulator.length - 1) {
+				plots += "t \'" + Simulator[i].estimador + "\' w linespoints pt " + (i+1) + "\n";
 			} else {
-				plots += "t \'" + simulador[i].estimador + "\' w linespoints pt " + (i+1) + ",";
+				plots += "t \'" + Simulator[i].estimador + "\' w linespoints pt " + (i+1) + ",";
 			}
 		}
-
-		String corpo_arquivo = xLabel + yLabel + setup6 + setup1 + setup2 + setup3 + setup4 + setup7 + setup5 + plots;
-
-		this.escrever_arquivo(nome_arquivo+".plt", corpo_arquivo);
+		return plots;
 	}
-
-
 
 }

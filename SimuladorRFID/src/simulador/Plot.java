@@ -64,6 +64,7 @@ public class Plot {
 			plots += "\"" + simulador[i].nome_arquivo + "\" u 1:";
 			switch(tipo){
 			case("slots"):
+			case("slotsq"):
 				plots += "2 ";
 				break;
 			case("colisao"):
@@ -75,7 +76,7 @@ public class Plot {
 				break;
 			case("tempo"):
 				plots += "5 ";
-				//setup7 = "set logscale y\n";
+				setup7 = "set logscale y\n";
 				break;
 			}
 			if(i == simulador.length - 1) {

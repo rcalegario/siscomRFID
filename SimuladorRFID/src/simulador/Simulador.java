@@ -110,10 +110,10 @@ public class Simulador {
 				switch(this.estimador){
 				case("lowerbound"):
 					tan_quadro = lowerbound(colisao);
-					break;
+				break;
 				case("eom-lee"):
 					tan_quadro = eomlee(colisao,sucesso,tan_quadro);
-					break;
+				break;
 				}
 			}
 
@@ -162,59 +162,26 @@ public class Simulador {
 		this.total_slots[posicao] += total_slots_usados;
 	}
 
-	private static class ThreadSimuladora implements Runnable {
-		private int i;
-		private Simulador sim;
-
-		public ThreadSimuladora(int i, Simulador sim) {
-			this.i = i;
-			this.sim = sim;
-		}
-
-		public void run() {
-			for (int j = 0; j < sim.repeticao; j++) {
-				double inicio = System.currentTimeMillis();
-
-				sim.simuladorQ(i);
-
-				double fim = System.currentTimeMillis();
-				sim.tempo_simulacao[i] += fim-inicio;
-			}
-		}
-	}
-
 	private void simular(){
 
-		if(!sim.estimador.equalsIgnoreCase("q")) {
-			Thread[] threads = new Thread[this.qtd_etiquetas.length];
+		for (int i = 0; i < this.qtd_etiquetas.length; i++) {
 
-			for (int i = 0; i < this.qtd_etiquetas.length; i++) {
-				Thread t = new Thread(new ThreadSimuladora(i, this));
-				threads[i] = t;
-				threads[i].start();
-			}
+			for (int j = 0; j < this.repeticao; j++) {
+				double inicio = System.currentTimeMillis();
 
-			for (int i = 0; i < this.qtd_etiquetas.length; i++) {
-				try {
-					threads[i].join();
+				if(!this.estimador.equalsIgnoreCase("q")) 
+					simulador(i);
+				else
+					simuladorQ(i);
 
-					this.total_slots[i] = this.total_slots[i]/this.repeticao;
-					this.total_slots_vazio[i] = this.total_slots_vazio[i]/this.repeticao;
-					this.total_slots_colisao[i] = this.total_slots_colisao[i]/this.repeticao;
-					this.tempo_simulacao[i] = this.tempo_simulacao[i]/this.repeticao;
-				} catch(Exception e) {
-					e.printStackTrace();
-				}
-			}
-		else {
-			for (int i = 0; i < this.qtd_etiquetas.length; i++) {
-				sim.simulador(i);
+				double fim = System.currentTimeMillis();
+				this.tempo_simulacao[i] += fim-inicio;
+			}				
 
-				this.total_slots[i] = this.total_slots[i]/this.repeticao;
-				this.total_slots_vazio[i] = this.total_slots_vazio[i]/this.repeticao;
-				this.total_slots_colisao[i] = this.total_slots_colisao[i]/this.repeticao;
-				this.tempo_simulacao[i] = this.tempo_simulacao[i]/this.repeticao;
-			}
+			this.total_slots[i] = this.total_slots[i]/this.repeticao;
+			this.total_slots_vazio[i] = this.total_slots_vazio[i]/this.repeticao;
+			this.total_slots_colisao[i] = this.total_slots_colisao[i]/this.repeticao;
+			this.tempo_simulacao[i] = this.tempo_simulacao[i]/this.repeticao;
 		}
 	}
 

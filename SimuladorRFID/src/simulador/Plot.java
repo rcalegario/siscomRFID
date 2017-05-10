@@ -59,7 +59,7 @@ public class Plot {
 		String setup2 = "set grid\n";
 		String setup3 = "set pointsize 2\n";
 		String setup4 = "set terminal png\n";
-		String setup5 = "set output './results/" + tipo + ".png'\n";
+		String setup5 = "set output './plots/" + tipo + ".png'\n";
 		String setup6 = ""; //"set monochrome\n";
 		String setup7 = "";
 
@@ -95,7 +95,7 @@ public class Plot {
 
 		String corpo_arquivo = xLabel + yLabel + setup6 + setup1 + setup2 + setup3 + setup4 + setup7 + setup5 + plots;
 
-		this.escrever_arquivo(nome_arquivo+".plt", corpo_arquivo);
+		this.escrever_arquivo("./scripts/" + nome_arquivo+".plt", corpo_arquivo);
 	}
 
 

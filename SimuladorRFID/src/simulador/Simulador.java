@@ -2,6 +2,7 @@ package simulador;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Random;
 
 public class Simulador {
@@ -86,11 +87,13 @@ public class Simulador {
 		//System.out.println(E +  " " + S +  " " + C );
 		
 		while(previous < next){
-			double pe = Math.pow((1 - (1/L)), n);
-			double ps = (n/L) * Math.pow((1 - (1/L)),n-1);
+			double x = 1 - (1/L);
+			double pe = Math.pow((x), n);
+			double ps = (n/L) * Math.pow(x,n-1);
 			double pc = 1 - pe - ps;
 			previous = next;
-			double a = (fac(L)/fac(E)*fac(S)*fac(C));
+			//double a = (fac(L)/fac(E)*fac(S)*fac(C));
+			double a = fac(L)/facMult(new int[]{E,S,C});
 			next = a*Math.pow(pe, E)*Math.pow(ps, S)*Math.pow(pc, C);
 			n++;
 			this.total_interacao[posicao]++;
@@ -109,7 +112,8 @@ public class Simulador {
 		
 		while (previous < next) {
 			double p1 = Math.pow((1 - (E/L)), n);
-			double x = (fac(n)/(fac(S)*fac(n-S)));
+			//double x = (fac(n)/(fac(S)*fac(n-S)));
+			double x = fac(n)/facMult(new int[]{S,n-S});
 			double y = Math.pow((L-E-S), (n-S)) / Math.pow((L-E), n);
 			double p2 = x*y*fac(S);
 			double p3 = 0;
@@ -117,8 +121,10 @@ public class Simulador {
 			for(int k = 0; k < C; k++) {
 				for(int v = 0; v < C - k; v++) {
 					double a = Math.pow(-1, k+v);
-					double b = fac(C)/(fac(k)*fac(C-k));
-					double c = fac(C-k)/(fac(v)*fac(C-k-v));
+					//double b = fac(C)/(fac(k)*fac(C-k));
+					double b = fac(C)/facMult(new int[]{k,C-k});
+					//double c = fac(C-k)/(fac(v)*fac(C-k-v));
+					double c = fac(C-k)/facMult(new int[]{v,(C-k-v)});
 					double d = fac(n-S)/fac(n-S-k);
 					double e = Math.pow((C-k-v), (n-S-k))/Math.pow(C, (n-S));
 					p3 = p3 + a * b * c * d * e;
@@ -131,6 +137,27 @@ public class Simulador {
 		}
 		
 		return n - 2;
+	}
+	
+	private double facMult(int[] nums){
+		double retorno = 1.0;
+		double fac = 0.0;
+		
+		Arrays.sort(nums);
+		
+		for (int i = 0; i < nums.length; i++) {
+			if(i == 0) 
+				fac = fac(nums[i]);
+			else{
+				int x = nums[i] - nums[i-1];
+				for (int j = 1; j <= x; j++) {
+					fac = fac * (nums[i-1] * j);
+				}
+			}
+			retorno *= fac;
+		}
+		
+		return retorno;
 	}
 	
 	private double fac(int num) {
@@ -261,7 +288,7 @@ public class Simulador {
 
 	public String gerar_arquivo(){
 
-		String nome_arquivo = estimador + "_" + qtd_inicial_etiquetas + "_" + incremeto + "_"+ max_etiquetas + "_"+ repeticao + "_"+ quadro_inicial + ".txt";
+		String nome_arquivo = "./results/" + estimador + "_" + qtd_inicial_etiquetas + "_" + incremeto + "_"+ max_etiquetas + "_"+ repeticao + "_"+ quadro_inicial + ".txt";
 
 		try {
 			FileWriter writer = new FileWriter(nome_arquivo);

@@ -1,11 +1,11 @@
-gnuplot script_grafico_total_colisao.plt
-gnuplot script_grafico_total_slots.plt
-gnuplot script_grafico_total_vazio.plt
-gnuplot script_grafico_tempo_medio.plt
-gnuplot script_q_grafico_total_slots.plt
+gnuplot scripts/script_grafico_total_colisao.plt
+gnuplot scripts/script_grafico_total_slots.plt
+gnuplot scripts/script_grafico_total_vazio.plt
+gnuplot scripts/script_grafico_tempo_medio.plt
+gnuplot scripts/script_q_grafico_total_slots.plt
 
-open results/colisao.png
-open results/slots.png
-open results/vazio.png
-open results/tempo.png
-open results/slotsq.png
+open plots/colisao.png
+open plots/slots.png
+open plots/vazio.png
+open plots/tempo.png
+open plots/slotsq.png

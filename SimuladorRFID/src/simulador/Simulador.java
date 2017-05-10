@@ -20,6 +20,7 @@ public class Simulador {
 	public int[] total_slots_vazio;
 	public int[] total_slots_colisao;
 	public double[] tempo_simulacao;
+	public int[] total_interacao;
 	public String nome_arquivo;
 
 	public Simulador(String e, int qie, int i, int me, int r, int qi){
@@ -40,6 +41,7 @@ public class Simulador {
 		this.total_slots_vazio = new int[tan];
 		this.total_slots_colisao = new int[tan];
 		this.tempo_simulacao = new double[tan];
+		this.total_interacao = new int[tan];
 
 		this.simular();
 
@@ -75,6 +77,70 @@ public class Simulador {
 		return (int) Math.ceil(gama_atual * colisoes);
 	}
 
+	private int chen(int E, int S, int C, int posicao){
+		int L = E + S + C;
+		int n =  S + 2*C;
+		double next = 0;
+		double previous = -1;
+		
+		//System.out.println(E +  " " + S +  " " + C );
+		
+		while(previous < next){
+			double pe = Math.pow((1 - (1/L)), n);
+			double ps = (n/L) * Math.pow((1 - (1/L)),n-1);
+			double pc = 1 - pe - ps;
+			previous = next;
+			double a = (fac(L)/fac(E)*fac(S)*fac(C));
+			next = a*Math.pow(pe, E)*Math.pow(ps, S)*Math.pow(pc, C);
+			n++;
+			this.total_interacao[posicao]++;
+		}
+		
+		return n - 2;
+	}
+	
+	private int vahedi(int E, int S, int C){
+		int L = E + S + C;
+		int n =  S + 2*C;
+		double next = 0;
+		double previous = -1;
+		
+		//System.out.println(E +  " " + S +  " " + C );
+		
+		while (previous < next) {
+			double p1 = Math.pow((1 - (E/L)), n);
+			double x = (fac(n)/(fac(S)*fac(n-S)));
+			double y = Math.pow((L-E-S), (n-S)) / Math.pow((L-E), n);
+			double p2 = x*y*fac(S);
+			double p3 = 0;
+
+			for(int k = 0; k < C; k++) {
+				for(int v = 0; v < C - k; v++) {
+					double a = Math.pow(-1, k+v);
+					double b = fac(C)/(fac(k)*fac(C-k));
+					double c = fac(C-k)/(fac(v)*fac(C-k-v));
+					double d = fac(n-S)/fac(n-S-k);
+					double e = Math.pow((C-k-v), (n-S-k))/Math.pow(C, (n-S));
+					p3 = p3 + a * b * c * d * e;
+				}
+			}
+
+			previous = next;
+			next = (fac(L)/fac(E)*fac(S)*fac(C))*p1*p2*p3;
+			n = n + 1;
+		}
+		
+		return n - 2;
+	}
+	
+	private double fac(int num) {
+		double fac = 1;
+		for(int i = 1; i <= num; i++) {
+			fac *= i;
+		}
+		return fac;
+	}
+	
 	private void simulador(int posicao){
 
 		Random ran = new Random();
@@ -113,6 +179,12 @@ public class Simulador {
 				break;
 				case("eom-lee"):
 					tan_quadro = eomlee(colisao,sucesso,tan_quadro);
+				break;
+				case("chen"):
+					tan_quadro = chen(vazio,sucesso,colisao,posicao) - sucesso;
+				break;
+				case("vahedi"):
+					tan_quadro = vahedi(vazio,sucesso,colisao) - sucesso;
 				break;
 				}
 			}
@@ -165,7 +237,9 @@ public class Simulador {
 	private void simular(){
 
 		for (int i = 0; i < this.qtd_etiquetas.length; i++) {
-
+			
+			System.out.println(qtd_etiquetas[i]);
+			
 			for (int j = 0; j < this.repeticao; j++) {
 				double inicio = System.currentTimeMillis();
 
@@ -196,10 +270,16 @@ public class Simulador {
 			if(this.estimador.equals("q")) j = 0;
 
 			for (int i = j; i < qtd_etiquetas.length; i++) {
-				if(i == 0)
-					writer.write(qtd_etiquetas[i] + " " + total_slots[i] + " " + total_slots_colisao[i] + " " + total_slots_vazio[i] + " " + tempo_simulacao[i] + "\n");
-				else
-					writer.append(qtd_etiquetas[i] + " " + total_slots[i] + " " + total_slots_colisao[i] + " " + total_slots_vazio[i] + " " + tempo_simulacao[i] + "\n");
+				if(i == 0){
+					writer.write(qtd_etiquetas[i] + " " + total_slots[i] + " " + total_slots_colisao[i] + " " + total_slots_vazio[i] + " " + tempo_simulacao[i]);
+					if(this.estimador.equals("chen")) writer.append(" " + total_interacao[i] + "\n");
+					else  writer.append("\n");
+				}else{
+					writer.append(qtd_etiquetas[i] + " " + total_slots[i] + " " + total_slots_colisao[i] + " " + total_slots_vazio[i] + " " + tempo_simulacao[i]);
+					if(this.estimador.equals("chen")) writer.append(" " + total_interacao[i] + "\n");
+					else  writer.append("\n");
+			
+				}
 			}
 
 			writer.flush();
@@ -239,8 +319,13 @@ public class Simulador {
 		for (int i = 0; i < qtd_etiquetas.length; i++) {
 			retorno += this.tempo_simulacao[i] + "\t";
 		}
+		
+		retorno += "\nTOTAL INTERACAO\t";
+		for (int i = 0; i < qtd_etiquetas.length; i++) {
+			retorno += this.total_interacao[i] + "\t";
+		}
 
-		return retorno + "\n";
+		return retorno;
 	}
 
 }

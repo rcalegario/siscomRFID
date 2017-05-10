@@ -49,6 +49,10 @@ public class Plot {
 			nome_arquivo = "script_grafico_tempo_medio";
 			yLabel = "set ylabel \"Tempo de Simulação\"\n";
 			break;
+		case("interacao"):
+			nome_arquivo = "script_grafico_total_interacao";
+			yLabel = "set ylabel \"Tempo de Simulação\"\n";
+			break;
 		}
 
 		String setup1 = "set key vertical top left\n";
@@ -56,7 +60,7 @@ public class Plot {
 		String setup3 = "set pointsize 2\n";
 		String setup4 = "set terminal png\n";
 		String setup5 = "set output './results/" + tipo + ".png'\n";
-		String setup6 = "set monochrome\n";
+		String setup6 = ""; //"set monochrome\n";
 		String setup7 = "";
 
 		String plots = "plot ";
@@ -72,11 +76,14 @@ public class Plot {
 				break;
 			case("vazio"):
 				plots += "4 ";
-				setup7 = "set yrange [0:1100]\n";
+				//setup7 = "set yrange [0:1100]\n";
 				break;
 			case("tempo"):
 				plots += "5 ";
 				setup7 = "set logscale y\n";
+				break;
+			case("interacao"):
+				plots += "6 ";
 				break;
 			}
 			if(i == simulador.length - 1) {

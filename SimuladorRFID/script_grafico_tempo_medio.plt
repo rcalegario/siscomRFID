@@ -1,5 +1,5 @@
 set xlabel "Número de etiquetas"
-set ylabel "Tempo de Simulação"
+set ylabel "Tempo de Simulação (ms)"
 set key vertical top left
 set grid
 set pointsize 2

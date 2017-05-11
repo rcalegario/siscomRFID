@@ -19,21 +19,21 @@ public class Principal {
 //		System.out.println(eomlee.toString());
 //		System.out.println("tempo eomlee: " + ((System.currentTimeMillis()-t0)) + " miliseg\n");
 //		
-//		System.out.println("Chen");
-//		Simulador chen = new Simulador("chen", 100, 100, 1000, 2000, 64);
-//		System.out.println(chen.toString());
-//		System.out.println("tempo chen: " + ((System.currentTimeMillis()-t0)) + " miliseg\n");
+		System.out.println("Chen");
+		Simulador chen = new Simulador("chen", 100, 100, 1000, 2000, 64);
+		System.out.println(chen.toString());
+		System.out.println("tempo chen: " + ((System.currentTimeMillis()-t0)) + " miliseg\n");
 		
 //		System.out.println("Q");
 //		Simulador algQ = new Simulador("q", 100, 100, 1000, 2000, 64);
 //		System.out.println(algQ.toString());
 //		System.out.println("tempo q: " + (System.currentTimeMillis()-t0) + " miliseg\n");
 //		
-		System.out.println("Vahedi");
-		Simulador vahedi = new Simulador("vahedi", 100, 100, 1000, 2000, 64);
-		System.out.println(vahedi.toString());
-		System.out.println("tempo vahedi: " + (System.currentTimeMillis()-t0) + " miliseg\n");
-		
+//		System.out.println("Vahedi");
+//		Simulador vahedi = new Simulador("vahedi", 100, 100, 1000, 2000, 64);
+//		System.out.println(vahedi.toString());
+//		System.out.println("tempo vahedi: " + (System.currentTimeMillis()-t0) + " miliseg\n");
+//		
 //		Simulador[] simuladores = {lowerbound, eomlee, chen, vahedi};
 //		plot.grafico(simuladores,"slots");
 //		plot.grafico(simuladores,"colisao");

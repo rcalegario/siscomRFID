@@ -93,8 +93,9 @@ public class Simulador {
 			double pc = 1 - pe - ps;
 			previous = next;
 			//double a = (fac(L)/fac(E)*fac(S)*fac(C));
-			double a = fac(L)/facMult(new int[]{E,S,C});
-			next = a*Math.pow(pe, E)*Math.pow(ps, S)*Math.pow(pc, C);
+			//double a = fac(L)/facMult(new int[]{E,S,C});
+			double a = Math.pow(pe, E)*Math.pow(ps, S)*Math.pow(pc, C);
+			next = fatSimples(L, E, S, C, a);
 			n++;
 			this.total_interacao[posicao]++;
 		}
@@ -138,6 +139,31 @@ public class Simulador {
 		
 		return n - 2;
 	}
+	
+	private double fatSimples(int a, int b, int c, int d, double m){
+        double result = m;
+
+        while(a > 1) {
+            result = result * a;
+            a = a - 1;
+            if (b > 1) {
+                result = result / b;
+                b = b - 1;
+            }
+
+            if(c > 1) {
+                result = result / c;
+                c = c - 1;
+            }
+
+            if(d > 1) {
+                result = result / d;
+                d = d - 1;
+            }
+        }
+
+        return result;
+    }
 	
 	private double facMult(int[] nums){
 		double retorno = 1.0;
@@ -208,7 +234,7 @@ public class Simulador {
 					tan_quadro = eomlee(colisao,sucesso,tan_quadro);
 				break;
 				case("chen"):
-					tan_quadro = chen(vazio,sucesso,colisao,posicao) - sucesso;
+					tan_quadro = chen(vazio,sucesso,colisao,posicao);
 				break;
 				case("vahedi"):
 					tan_quadro = vahedi(vazio,sucesso,colisao) - sucesso;
@@ -288,7 +314,7 @@ public class Simulador {
 
 	public String gerar_arquivo(){
 
-		String nome_arquivo = "./results/" + estimador + "_" + qtd_inicial_etiquetas + "_" + incremeto + "_"+ max_etiquetas + "_"+ repeticao + "_"+ quadro_inicial + ".txt";
+		String nome_arquivo = estimador + "_" + qtd_inicial_etiquetas + "_" + incremeto + "_"+ max_etiquetas + "_"+ repeticao + "_"+ quadro_inicial + ".txt";
 
 		try {
 			FileWriter writer = new FileWriter(nome_arquivo);
